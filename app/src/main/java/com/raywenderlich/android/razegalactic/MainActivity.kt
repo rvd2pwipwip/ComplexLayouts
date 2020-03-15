@@ -31,8 +31,10 @@
 package com.raywenderlich.android.razegalactic
 
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
 import android.support.v7.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import android.transition.TransitionManager
+import kotlinx.android.synthetic.main.keyframe1.*
 
 /**
  * Main Screen
@@ -41,10 +43,34 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    setContentView(R.layout.keyframe1)
 
     switch1.setOnCheckedChangeListener { _, isChecked ->
       switch1.setText(if (isChecked) R.string.round_trip else R.string.one_way)
     }
+
+    // https://www.raywenderlich.com/9475-constraintlayout-tutorial-for-android-complex-layouts
+    constraintSet1.clone(constraintLayout) //1
+    constraintSet2.clone(this, R.layout.activity_main) //2
+
+    departButton.setOnClickListener { //3
+      //apply the transition
+      TransitionManager.beginDelayedTransition(constraintLayout) //4
+      val constraint = if (!isOffscreen) constraintSet1 else constraintSet2
+      isOffscreen = !isOffscreen
+      constraint.applyTo(constraintLayout) //5
+    }
+
+
   }
+
+//  The first two properties are the constraint sets that you’ll use to animate your view.
+//  You will use the boolean to keep track of the layout state.
+
+  private val constraintSet1 = ConstraintSet()
+  private val constraintSet2 = ConstraintSet()
+
+  private var isOffscreen = true
+
+
 }
